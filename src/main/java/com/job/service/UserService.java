@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.job.domain.User;
 import com.job.reponsitory.UserRepository;
 
+
 @Service
 public class UserService {
     private final UserRepository userReponsitory;
@@ -15,6 +16,7 @@ public class UserService {
         this.userReponsitory = userReponsitory;
     }
 public User createUser(User user) {
+
     return userReponsitory.save(user);
 }
 public void handleDeleteUser(Long id) {
@@ -40,5 +42,8 @@ public User handleUpdateUser(User user) {
 }
 public List<User> handleFindAllUsers() {
     return userReponsitory.findAll();
+}
+public User handleGetUserByUsername(String username) {
+    return userReponsitory.findByEmail(username);
 }
 }

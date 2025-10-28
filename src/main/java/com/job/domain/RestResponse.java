@@ -4,6 +4,7 @@ public class RestResponse<T> {
     private int statusCode;
     private String error;
 
+    
     private Object message;
     private T data;
     public RestResponse(int statusCode, String error, Object message, T data) {
@@ -11,6 +12,8 @@ public class RestResponse<T> {
         this.error = error;
         this.message = message;
         this.data = data;
+    }
+    public RestResponse() {
     }
     public int getStatusCode() {
         return statusCode;
@@ -36,6 +39,7 @@ public class RestResponse<T> {
     public void setData(T data) {
         this.data = data;
     }
+   
     
     
 }

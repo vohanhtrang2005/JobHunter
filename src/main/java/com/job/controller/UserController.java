@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.method.P;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.job.domain.User;
 import com.job.service.UserService;
-import com.job.service.error.IdInvalidException;
+import com.job.util.error.IdInvalidException;
 
 
 
@@ -29,13 +30,16 @@ import com.job.service.error.IdInvalidException;
 @RestController
 public class UserController {
     private final UserService userService;
-    public UserController(UserService userService) {
+    private final PasswordEncoder passwordEncoder;
+    public UserController(UserService userService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/users")
     public ResponseEntity<User> createNewUser(@RequestBody User PostManUser) {
-        
+        String hashPassword= this.passwordEncoder.encode(PostManUser.getPassword());
+        PostManUser.setPassword(hashPassword);
         User user = userService.createUser(PostManUser);
         return  ResponseEntity.status(HttpStatus.CREATED).body(user);
         
