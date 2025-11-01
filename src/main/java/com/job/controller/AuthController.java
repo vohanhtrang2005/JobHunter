@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.job.domain.dto.LoginDTO;
+import com.job.util.SecurityUtil;
 
 import jakarta.validation.Valid;
 
@@ -19,8 +20,10 @@ import jakarta.validation.Valid;
 public class AuthController {
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder) {
+    private final SecurityUtil securityUtil;        
+    public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder, SecurityUtil securityUtil) {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
+        this.securityUtil = securityUtil;
     }
     @PostMapping("/login")
     public ResponseEntity<LoginDTO> login(@Valid  @RequestBody LoginDTO loginDto) {
@@ -30,7 +33,7 @@ public class AuthController {
 
 //xác thực người dùng => cần viết hàm loadUserByUsername
 Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-
+this.securityUtil.createToken(authentication);
 return ResponseEntity.ok().body(loginDto);
     }
 }
