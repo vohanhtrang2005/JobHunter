@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.job.domain.dto.LoginDTO;
+import com.job.domain.dto.RestLoginDTO;
 import com.job.util.SecurityUtil;
 
 import jakarta.validation.Valid;
@@ -26,14 +27,17 @@ public class AuthController {
         this.securityUtil = securityUtil;
     }
     @PostMapping("/login")
-    public ResponseEntity<LoginDTO> login(@Valid  @RequestBody LoginDTO loginDto) {
+    public ResponseEntity<RestLoginDTO> login(@Valid  @RequestBody LoginDTO loginDto) {
         //Nạp input gồm username/password vào Security
  UsernamePasswordAuthenticationToken authenticationToken 
 = new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword());
 
 //xác thực người dùng => cần viết hàm loadUserByUsername
 Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-this.securityUtil.createToken(authentication);
-return ResponseEntity.ok().body(loginDto);
+//create tooken 
+String access_token = this.securityUtil.createToken(authentication);
+RestLoginDTO res = new RestLoginDTO();
+res.setAccessToken(access_token);
+return ResponseEntity.ok(res);
     }
 }

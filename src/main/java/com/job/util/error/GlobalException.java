@@ -19,15 +19,16 @@ import com.job.domain.RestResponse;
 @RestControllerAdvice
 public class GlobalException {
       @ExceptionHandler(value = {
-      IdInvalidException.class,
+     
       UsernameNotFoundException.class,
       BadCredentialsException.class}
       )
-public ResponseEntity<RestResponse<Object>> handleIdException(IdInvalidException idException) {
-  RestResponse<Object> res = new RestResponse<>();
-    res.setError(idException.getMessage());
+      
+public ResponseEntity<RestResponse<Object>> handleIdException(Exception ex) {
+  RestResponse<Object> res = new RestResponse<Object>();
+    res.setError(ex.getMessage());
     res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-    res.setMessage("IdInvalidException occurred");
+    res.setMessage("Exception occurrs...");
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
 }  
     @ExceptionHandler(MethodArgumentNotValidException.class)
