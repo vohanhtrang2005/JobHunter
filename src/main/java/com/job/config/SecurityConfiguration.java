@@ -30,8 +30,14 @@ import com.nimbusds.jose.util.Base64;
 @Configuration
 @EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfiguration {
+
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 @Value("${hoidanit.jwt.base64-secret}")
     private String jwtKey;
+
+    SecurityConfiguration(CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
+        this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
+    }
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -40,7 +46,8 @@ public class SecurityConfiguration {
  
 
      @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http,
+    CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
         http
         .csrf(c -> c.disable())
                 .authorizeHttpRequests(
@@ -50,7 +57,10 @@ public class SecurityConfiguration {
                                 
                               
                 )
-                  .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
+                  .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults())
+                  .authenticationEntryPoint(customAuthenticationEntryPoint)     
+                  )
+                          
                   .exceptionHandling(
                     exceptions -> exceptions
                     .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
