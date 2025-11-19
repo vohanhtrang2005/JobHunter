@@ -61,11 +61,11 @@ public class SecurityConfiguration {
                   .authenticationEntryPoint(customAuthenticationEntryPoint)     
                   )
                           
-                  .exceptionHandling(
-                    exceptions -> exceptions
-                    .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
-                    .accessDeniedHandler(new BearerTokenAccessDeniedHandler())
-                  )
+                //   .exceptionHandling(
+                //     exceptions -> exceptions
+                //     .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
+                //     .accessDeniedHandler(new BearerTokenAccessDeniedHandler())
+                //   )
 
                 .formLogin(f-> f.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
