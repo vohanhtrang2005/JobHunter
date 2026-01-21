@@ -3,6 +3,8 @@ package com.job.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.query.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.job.domain.User;
@@ -46,4 +48,8 @@ public List<User> handleFindAllUsers() {
 public User handleGetUserByUsername(String username) {
     return userReponsitory.findByEmail(username);
 }
-}
+public List<User> fetchAllUsers(Pageable pageable) {
+    org.springframework.data.domain.Page<User> pageUser = userReponsitory.findAll(pageable);
+ 
+    return pageUser.getContent();
+}}

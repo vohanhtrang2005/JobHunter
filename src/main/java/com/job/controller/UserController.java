@@ -2,8 +2,10 @@ package com.job.controller;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Pageable; 
 
 import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties.Http;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -67,8 +69,14 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
   @GetMapping("/users")
-public ResponseEntity<List<User>> getAllUsers() {
-    return ResponseEntity.ok(userService.handleFindAllUsers());
+public ResponseEntity<List<User>> getAllUsers(
+    @RequestParam("current") Optional<String> currentOptional,
+    @RequestParam("pageSize") Optional<String> pageSizeOptional
+) {
+    String sCurrent = currentOptional.isPresent() ? currentOptional.get() : "1";
+    String sPageSize = pageSizeOptional.isPresent() ? pageSizeOptional.get() : "10";
+   Pageable pageable = PageRequest.of(Integer.parseInt(sCurrent)-1,Integer.parseInt(sPageSize));
+    return ResponseEntity.status(HttpStatus.OK).body(this.userService.fetchAllUsers(pageable));
 }
 
 }
