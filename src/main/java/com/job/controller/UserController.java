@@ -2,7 +2,7 @@ package com.job.controller;
 
 import java.util.List;
 import java.util.Optional;
-import org.springframework.data.domain.Pageable; 
+import org.springframework.data.domain.Pageable;
 
 import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties.Http;
 import org.springframework.data.domain.PageRequest;
@@ -26,13 +26,11 @@ import com.job.domain.User;
 import com.job.service.UserService;
 import com.job.util.error.IdInvalidException;
 
-
-
-
 @RestController
 public class UserController {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+
     public UserController(UserService userService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
@@ -40,44 +38,48 @@ public class UserController {
 
     @PostMapping("/users")
     public ResponseEntity<User> createNewUser(@RequestBody User PostManUser) {
-        String hashPassword= this.passwordEncoder.encode(PostManUser.getPassword());
+        String hashPassword = this.passwordEncoder.encode(PostManUser.getPassword());
         PostManUser.setPassword(hashPassword);
         User user = userService.createUser(PostManUser);
-        return  ResponseEntity.status(HttpStatus.CREATED).body(user);
-        
-    }
- 
+        return ResponseEntity.status(HttpStatus.CREATED).body(user);
 
-    @DeleteMapping("/users/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable("id") Long id) throws IdInvalidException{
-        if(id>=1500){
-            throw new IdInvalidException("ID is invalid, must be less than 1500");              
-        }
-         userService.handleDeleteUser(id);
-         return ResponseEntity.ok("User deleted successfully");
     }
-       @PutMapping("/users")
+
+    // @ExceptionHandler(value = IdInvalidException.class)
+    // public ResponseEntity<String> ex (IdInvalidException idInvalidException){
+    //     return ResponseEntity.badRequest().body(idInvalidException.getMessage());
+    // }
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable("id") Long id) throws IdInvalidException {
+        if (id >= 1500) {
+            throw new IdInvalidException("ID is invalid, must be less than 1500");
+        }
+        userService.handleDeleteUser(id);
+        return ResponseEntity.ok("User deleted successfully");
+    }
+
+    @PutMapping("/users")
     public ResponseEntity<User> putUser(@RequestBody User PostManUser) {
-       
-        User  user = this.userService.handleUpdateUser(PostManUser); 
+
+        User user = this.userService.handleUpdateUser(PostManUser);
 
         return ResponseEntity.ok(user);
     }
+
     @GetMapping("/users/{id}")
     public ResponseEntity<User> getUserById(@PathVariable("id") Long id) {
-      User user = this.userService.handleFindUser(id);
+        User user = this.userService.handleFindUser(id);
         return ResponseEntity.ok(user);
     }
-  @GetMapping("/users")
-public ResponseEntity<List<User>> getAllUsers(
-    @RequestParam("current") Optional<String> currentOptional,
-    @RequestParam("pageSize") Optional<String> pageSizeOptional
-) {
-    String sCurrent = currentOptional.isPresent() ? currentOptional.get() : "1";
-    String sPageSize = pageSizeOptional.isPresent() ? pageSizeOptional.get() : "10";
-   Pageable pageable = PageRequest.of(Integer.parseInt(sCurrent)-1,Integer.parseInt(sPageSize));
-    return ResponseEntity.status(HttpStatus.OK).body(this.userService.fetchAllUsers(pageable));
-}
+
+    @GetMapping("/users")
+    public ResponseEntity<List<User>> getAllUsers(
+            @RequestParam("current") Optional<String> currentOptional,
+            @RequestParam("pageSize") Optional<String> pageSizeOptional) {
+        String sCurrent = currentOptional.isPresent() ? currentOptional.get() : "1";
+        String sPageSize = pageSizeOptional.isPresent() ? pageSizeOptional.get() : "10";
+        Pageable pageable = PageRequest.of(Integer.parseInt(sCurrent) - 1, Integer.parseInt(sPageSize));
+        return ResponseEntity.status(HttpStatus.OK).body(this.userService.fetchAllUsers(pageable));
+    }
 
 }
- 
