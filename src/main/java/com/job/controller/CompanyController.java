@@ -1,7 +1,11 @@
 package com.job.controller;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.hibernate.query.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,7 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.job.domain.Company;
 import com.job.service.CompanyService;
 
-import org.springframework.web.bind.annotation.RequestBody;   
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.validation.Valid;
 
@@ -29,11 +34,17 @@ public class CompanyController {
          return ResponseEntity.status(HttpStatus.CREATED).body(this.companyService.handleCreateService(reqCompany));
      }
      @GetMapping("companies")
-     public ResponseEntity<List<Company>> getCompany() {
-          List<Company> companies = this.companyService.handleGetCompany();
-          return ResponseEntity.ok(companies);
+     public ResponseEntity<List<Company>> getCompany(@RequestParam("current") Optional<String> currentOptional,
+@RequestParam("pageSize") Optional<String> pageSizeOptional) {
 
-     }
+             String sCurrent = currentOptional.isPresent() ? currentOptional.get() : "1";
+        String sPageSize = pageSizeOptional.isPresent() ? pageSizeOptional.get() : "2";
+        Pageable pageable = PageRequest.of(Integer.parseInt(sCurrent) - 1, Integer.parseInt(sPageSize));
+        return ResponseEntity.status(HttpStatus.OK).body(this.companyService.handleGetCompany(pageable));
+    }
+               
+    
+     
      @PutMapping("/companies")
      public ResponseEntity<Company> updateCompany(@Valid @RequestBody Company reqCompany) {
           Company updatedCompany = this.companyService.handleUpdateCompany(reqCompany);

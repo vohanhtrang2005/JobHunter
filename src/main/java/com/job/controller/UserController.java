@@ -23,18 +23,30 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.job.domain.User;
+import com.job.domain.dto.ResultPaginationDTO;
 import com.job.service.UserService;
 import com.job.util.error.IdInvalidException;
 
 @RestController
 public class UserController {
     private final UserService userService;
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder; 
 
     public UserController(UserService userService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
     }
+
+
+
+
+
+
+
+
+
+
+
 
     @PostMapping("/users")
     public ResponseEntity<User> createNewUser(@RequestBody User PostManUser) {
@@ -73,7 +85,7 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<List<User>> getAllUsers(
+    public ResponseEntity<ResultPaginationDTO> getAllUsers(
             @RequestParam("current") Optional<String> currentOptional,
             @RequestParam("pageSize") Optional<String> pageSizeOptional) {
         String sCurrent = currentOptional.isPresent() ? currentOptional.get() : "1";

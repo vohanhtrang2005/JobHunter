@@ -19,6 +19,8 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
 import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
 import org.springframework.security.web.SecurityFilterChain;
@@ -82,6 +84,17 @@ public JwtEncoder jwtEncoder() {
         byte[] keyBytes = Base64.from(jwtKey).decode();
         return new SecretKeySpec(keyBytes, 0, keyBytes.length, SecurityUtil.JWT_ALGORITHM.getName());
   }
+   @Bean 
+ public JwtAuthenticationConverter jwtAuthenticationConverter() {  
+    JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new  JwtGrantedAuthoritiesConverter(); 
+ grantedAuthoritiesConverter.setAuthorityPrefix(""); 
+ grantedAuthoritiesConverter.setAuthoritiesClaimName("vohanhtrang"); 
+ JwtAuthenticationConverter jwtAuthenticationConverter = new  JwtAuthenticationConverter(); 
+  
+jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter); 
+ return jwtAuthenticationConverter; 
+ }
+
 @Bean
     public JwtDecoder jwtDecoder() {
         NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withSecretKey(

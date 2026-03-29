@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.job.domain.User;
+import com.job.domain.dto.Meta;
+import com.job.domain.dto.ResultPaginationDTO;
 import com.job.reponsitory.UserRepository;
 
 
@@ -48,8 +50,18 @@ public List<User> handleFindAllUsers() {
 public User handleGetUserByUsername(String username) {
     return userReponsitory.findByEmail(username);
 }
-public List<User> fetchAllUsers(Pageable pageable) {
+public ResultPaginationDTO fetchAllUsers(Pageable pageable) {
     org.springframework.data.domain.Page<User> pageUser = userReponsitory.findAll(pageable);
- 
-    return pageUser.getContent();
+    ResultPaginationDTO rs = new ResultPaginationDTO();
+ Meta mt = new Meta();
+    mt.setPage(pageable.getPageNumber());   
+    mt.setPageSize(pageable.getPageSize());
+
+    mt.setTotal(pageUser.getTotalElements());
+    mt.setPages(pageUser.getTotalPages());
+    rs.setMeta(mt);
+    rs.setResult(pageUser.getContent());
+    
+
+    return rs;
 }}

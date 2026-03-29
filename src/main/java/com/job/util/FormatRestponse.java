@@ -39,8 +39,9 @@ public class FormatRestponse implements ResponseBodyAdvice<Object> {
         }
               if(status>=400){
                 //case error
-                res.setError("Call API FAILED");
-                res.setMessage(body);
+               return body;
+             
+       
 
               }
               else{

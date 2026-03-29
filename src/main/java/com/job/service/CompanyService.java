@@ -3,6 +3,8 @@ package com.job.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.job.domain.Company;
@@ -19,8 +21,10 @@ public class CompanyService {
     public Company handleCreateService(Company reqCompany) {
         return companyRepository.save(reqCompany);
     }
-    public List<Company> handleGetCompany() {
-        return companyRepository.findAll();
+    public List<Company> handleGetCompany(Pageable pageable) {
+        Page<Company> pageCompany = companyRepository.findAll(pageable);
+        return pageCompany.getContent();
+     
     }
     @PreUpdate
     public Company handleUpdateCompany(Company c){
