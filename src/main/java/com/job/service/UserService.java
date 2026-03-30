@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.hibernate.query.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.job.domain.User;
@@ -50,11 +51,11 @@ public List<User> handleFindAllUsers() {
 public User handleGetUserByUsername(String username) {
     return userReponsitory.findByEmail(username);
 }
-public ResultPaginationDTO fetchAllUsers(Pageable pageable) {
-    org.springframework.data.domain.Page<User> pageUser = userReponsitory.findAll(pageable);
+public ResultPaginationDTO fetchAllUsers(Specification spec, Pageable pageable) {
+  org.springframework.data.domain.Page<User> pageUser = userReponsitory.findAll(spec, pageable);
     ResultPaginationDTO rs = new ResultPaginationDTO();
  Meta mt = new Meta();
-    mt.setPage(pageable.getPageNumber());   
+    mt.setPage(pageable.getPageNumber()+1);   
     mt.setPageSize(pageable.getPageSize());
 
     mt.setTotal(pageUser.getTotalElements());

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import com.job.domain.RestResponse;
+import com.job.util.annotation.ApiMessage;
 
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -46,7 +47,8 @@ public class FormatRestponse implements ResponseBodyAdvice<Object> {
               }
               else{
                 res.setData(body);
-                 res.setMessage("Call API success");
+                ApiMessage apiMessage = returnType.getMethodAnnotation(ApiMessage.class);
+                res.setMessage(apiMessage != null ? apiMessage.value() : "Call api success");
 
                 //case success
          

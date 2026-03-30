@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.hibernate.query.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,7 +17,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.job.domain.Company;
+import com.job.domain.dto.ResultPaginationDTO;
 import com.job.service.CompanyService;
+import com.turkraft.springfilter.boot.Filter;
 
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,17 +33,13 @@ public class CompanyController {
          this.companyService = companyService;
     }
      @PostMapping("/companies")
-     public ResponseEntity<?> createCompany(@Valid @RequestBody Company reqCompany) {
+     public ResponseEntity<Company> createCompany(@Valid @RequestBody Company reqCompany) {
          return ResponseEntity.status(HttpStatus.CREATED).body(this.companyService.handleCreateService(reqCompany));
      }
      @GetMapping("companies")
-     public ResponseEntity<List<Company>> getCompany(@RequestParam("current") Optional<String> currentOptional,
-@RequestParam("pageSize") Optional<String> pageSizeOptional) {
+     public ResponseEntity<ResultPaginationDTO> getCompany(@Filter Specification spec, Pageable pageable) {
 
-             String sCurrent = currentOptional.isPresent() ? currentOptional.get() : "1";
-        String sPageSize = pageSizeOptional.isPresent() ? pageSizeOptional.get() : "2";
-        Pageable pageable = PageRequest.of(Integer.parseInt(sCurrent) - 1, Integer.parseInt(sPageSize));
-        return ResponseEntity.status(HttpStatus.OK).body(this.companyService.handleGetCompany(pageable));
+        return ResponseEntity.status(HttpStatus.OK).body(this.companyService.handleGetCompany(spec,pageable));
     }
                
     

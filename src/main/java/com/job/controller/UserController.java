@@ -3,7 +3,7 @@ package com.job.controller;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Pageable;
-
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties.Http;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -25,7 +25,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.job.domain.User;
 import com.job.domain.dto.ResultPaginationDTO;
 import com.job.service.UserService;
+import com.job.util.annotation.ApiMessage;
 import com.job.util.error.IdInvalidException;
+import com.turkraft.springfilter.boot.Filter;
 
 @RestController
 public class UserController {
@@ -85,13 +87,10 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<ResultPaginationDTO> getAllUsers(
-            @RequestParam("current") Optional<String> currentOptional,
-            @RequestParam("pageSize") Optional<String> pageSizeOptional) {
-        String sCurrent = currentOptional.isPresent() ? currentOptional.get() : "1";
-        String sPageSize = pageSizeOptional.isPresent() ? pageSizeOptional.get() : "10";
-        Pageable pageable = PageRequest.of(Integer.parseInt(sCurrent) - 1, Integer.parseInt(sPageSize));
-        return ResponseEntity.status(HttpStatus.OK).body(this.userService.fetchAllUsers(pageable));
+    @ApiMessage("Fetch all users")
+    public ResponseEntity<ResultPaginationDTO> getAllUsers(  @Filter Specification<User> spec , Pageable pageable) {
+               
+        return ResponseEntity.status(HttpStatus.OK).body(this.userService.fetchAllUsers(spec,pageable));
     }
 
 }

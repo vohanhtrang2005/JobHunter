@@ -5,9 +5,12 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.job.domain.Company;
+import com.job.domain.dto.Meta;
+import com.job.domain.dto.ResultPaginationDTO;
 import com.job.reponsitory.CompanyReponsitory;
 
 import jakarta.persistence.PreUpdate;
@@ -21,9 +24,17 @@ public class CompanyService {
     public Company handleCreateService(Company reqCompany) {
         return companyRepository.save(reqCompany);
     }
-    public List<Company> handleGetCompany(Pageable pageable) {
-        Page<Company> pageCompany = companyRepository.findAll(pageable);
-        return pageCompany.getContent();
+    public ResultPaginationDTO handleGetCompany(Specification<Company> spec, Pageable pageable) {
+        Page<Company> pageCompany = companyRepository.findAll(spec,pageable);
+        ResultPaginationDTO rs = new ResultPaginationDTO();
+        Meta mt = new Meta();
+        mt.setPage(pageable.getPageNumber()+1);
+        mt.setPageSize(pageable.getPageSize());
+        mt.setTotal(pageCompany.getTotalElements());
+        mt.setPages(pageCompany.getTotalPages());
+        rs.setMeta(mt);
+        rs.setResult(pageCompany.getContent());
+        return rs;
      
     }
     @PreUpdate
