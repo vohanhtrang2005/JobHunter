@@ -47,7 +47,7 @@ public class Company {
 
         @PrePersist
        public void handleBeforeCreate() {
-             this.createdBy = SecurityUtil.getCurrentUserLogin().orElse("");
+      this.createdBy = SecurityUtil.getCurrentUserLogin().orElse("");
        this.createAt=Instant.now();
        }
     } 

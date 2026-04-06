@@ -24,10 +24,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.job.domain.User;
 import com.job.domain.dto.ResultPaginationDTO;
+import com.job.domain.dto.ResCreateUserDTO;
+import com.job.domain.dto.ResUpdateUserDTO;
+import com.job.domain.dto.ResUserDTO;
 import com.job.service.UserService;
 import com.job.util.annotation.ApiMessage;
 import com.job.util.error.IdInvalidException;
 import com.turkraft.springfilter.boot.Filter;
+
+import jakarta.validation.Valid;
 
 @RestController
 public class UserController {
@@ -38,24 +43,20 @@ public class UserController {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
     }
+      @PostMapping("/users")
+    @ApiMessage("Create a new user")
+    public ResponseEntity<ResCreateUserDTO> createNewUser(@Valid @RequestBody User PostManUser) throws IdInvalidException {
+        boolean isEmailExist = this.userService.isEmailExist(PostManUser.getEmail());
+        if (isEmailExist) {
+            throw new IdInvalidException("Email already exists");
+        }
 
-
-
-
-
-
-
-
-
-
-
-
-    @PostMapping("/users")
-    public ResponseEntity<User> createNewUser(@RequestBody User PostManUser) {
         String hashPassword = this.passwordEncoder.encode(PostManUser.getPassword());
         PostManUser.setPassword(hashPassword);
         User user = userService.createUser(PostManUser);
-        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+        ResCreateUserDTO userDTO = userService.convertToResCreateUserDTO(user);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
 
     }
 
@@ -64,26 +65,43 @@ public class UserController {
     //     return ResponseEntity.badRequest().body(idInvalidException.getMessage());
     // }
     @DeleteMapping("/users/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable("id") Long id) throws IdInvalidException {
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) throws IdInvalidException {
         if (id >= 1500) {
             throw new IdInvalidException("ID is invalid, must be less than 1500");
         }
+        User currentUser = this.userService.fetchUserById(id);
+        if(currentUser == null) {
+            throw new IdInvalidException("User with ID " + id + " does not exist");
+        }
         userService.handleDeleteUser(id);
-        return ResponseEntity.ok("User deleted successfully");
+
+        return ResponseEntity.ok(null);
     }
 
     @PutMapping("/users")
-    public ResponseEntity<User> putUser(@RequestBody User PostManUser) {
+    public ResponseEntity<ResUpdateUserDTO> putUser(@RequestBody User PostManUser) throws IdInvalidException {
+         if(PostManUser.getId() == null) {
+            throw new IdInvalidException("ID is required for update");
+        }
+         if(PostManUser.getId() >= 1500) {
+            throw new IdInvalidException("ID is invalid, must be less than 1500");
+        }
 
         User user = this.userService.handleUpdateUser(PostManUser);
-
-        return ResponseEntity.ok(user);
+if(user==null) {
+    throw new IdInvalidException("User with ID " + PostManUser.getId() + " does not exist");
+}
+        return ResponseEntity.ok(this.userService.resUpdateUserDTO(user));
     }
 
     @GetMapping("/users/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable("id") Long id) {
+    public ResponseEntity<ResUserDTO> getUserById(@PathVariable("id") Long id) throws IdInvalidException {
         User user = this.userService.handleFindUser(id);
-        return ResponseEntity.ok(user);
+        if(user == null) {
+           throw new IdInvalidException("User with ID " + id + " does not exist");
+        }
+        
+        return ResponseEntity.ok(this.userService.convertToResUserDTO(user));
     }
 
     @GetMapping("/users")

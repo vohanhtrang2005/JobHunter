@@ -1,8 +1,10 @@
 package com.job.service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.coyote.BadRequestException;
 import org.hibernate.query.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -10,8 +12,12 @@ import org.springframework.stereotype.Service;
 
 import com.job.domain.User;
 import com.job.domain.dto.Meta;
+import com.job.domain.dto.ResCreateUserDTO;
+import com.job.domain.dto.ResUpdateUserDTO;
+import com.job.domain.dto.ResUserDTO;
 import com.job.domain.dto.ResultPaginationDTO;
 import com.job.reponsitory.UserRepository;
+import com.job.util.constant.GenderEnum;
 
 
 @Service
@@ -20,10 +26,26 @@ public class UserService {
     public UserService(UserRepository userReponsitory) {
         this.userReponsitory = userReponsitory;
     }
-public User createUser(User user) {
-
-    return userReponsitory.save(user);
+public User createUser(User user)  {
+   
+  return userReponsitory.save(user);
 }
+
+public ResCreateUserDTO convertToResCreateUserDTO(User user) {
+    ResCreateUserDTO userDTO = new ResCreateUserDTO();
+    userDTO.setAddress(user.getAddress());
+    userDTO.setAge(user.getAge());
+    userDTO.setCreatedAt(user.getCreatedAt());
+    userDTO.setId(user.getId());
+    userDTO.setGender(user.getGender());
+    userDTO.setName(user.getName());
+    userDTO.setEmail(user.getEmail());
+    return userDTO;
+}
+public boolean isEmailExist(String email) {
+    return userReponsitory.existsByEmail(email);
+}
+
 public void handleDeleteUser(Long id) {
     userReponsitory.deleteById(id);
 }
@@ -61,8 +83,53 @@ public ResultPaginationDTO fetchAllUsers(Specification spec, Pageable pageable) 
     mt.setTotal(pageUser.getTotalElements());
     mt.setPages(pageUser.getTotalPages());
     rs.setMeta(mt);
-    rs.setResult(pageUser.getContent());
+  List<ResUserDTO> listUserDTO = pageUser.getContent().stream().map(u -> convertToResUserDTO(u)).toList();
+
+
+    rs.setResult(listUserDTO);
     
 
     return rs;
-}}
+}
+public User fetchUserById(Long id) {
+    Optional<User> user = userReponsitory.findById(id);
+    if(user.isPresent()) {
+        return user.get();
+    }
+    return null;
+
+}
+
+
+public ResUpdateUserDTO resUpdateUserDTO (User user) {
+    ResUpdateUserDTO userDTO = new ResUpdateUserDTO();
+    userDTO.setAddress(user.getAddress());
+    userDTO.setAge(user.getAge());
+    
+    userDTO.setId(user.getId());
+    userDTO.setGender(user.getGender());
+    userDTO.setName(user.getName());
+
+    userDTO.setUpdatedAt(user.getUpdatedAt());
+    return userDTO;
+}
+public ResUserDTO convertToResUserDTO(User user) {
+    ResUserDTO userDTO = new ResUserDTO();
+    userDTO.setAddress(user.getAddress());
+    userDTO.setAge(user.getAge());
+    userDTO.setCreatedAt(user.getCreatedAt());
+    userDTO.setId(user.getId());
+    userDTO.setGender(user.getGender());
+    userDTO.setName(user.getName());
+    userDTO.setEmail(user.getEmail());
+    userDTO.setUpdatedAt(user.getUpdatedAt());
+    return userDTO;
+} 
+public void updateUserToken(String token, String email){
+    User currentUser = this.handleGetUserByUsername(email);
+    if(currentUser != null){
+        currentUser.setRefreshToken(token);
+        this.userReponsitory.save(currentUser);
+    }
+}
+}
