@@ -151,6 +151,27 @@ return ResponseEntity.ok()
 .body(res);
 
 }
+@PostMapping("/auth/logout")
+@ApiMessage("logout user")
+public ResponseEntity<Void> logout() throws IdInvalidException {
+    String email = SecurityUtil.getCurrentUserLogin().isPresent() 
+    ? SecurityUtil.getCurrentUserLogin().get() : "";
+    if(email.equals("")){
+        throw new IdInvalidException("Access token không hợp lệ");
+    }
+    //update refresh token = null
+    this.userService.updateUserToken("null", email);
+   
+    ResponseCookie deletResponseCookie = ResponseCookie
+.from("refresh_token", "null")
+.httpOnly(true)
+.path("/")
+.maxAge(0)
+.build();
+    return ResponseEntity.ok()
+    .header(HttpHeaders.SET_COOKIE, deletResponseCookie.toString())
+    .body(null);
+}
 
 
 
