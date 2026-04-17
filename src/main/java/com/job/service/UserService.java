@@ -132,4 +132,6 @@ public void updateUserToken(String token, String email){
         this.userReponsitory.save(currentUser);
     }
 }
-}
+public User findByRefreshTokenAndEmail(String refreshToken, String email) {
+    return this.userReponsitory.findByRefreshTokenAndEmail(refreshToken, email);
+}}

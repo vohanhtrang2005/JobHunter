@@ -9,6 +9,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,8 +21,11 @@ import com.job.domain.dto.RestLoginDTO;
 import com.job.service.UserService;
 import com.job.util.SecurityUtil;
 import com.job.util.annotation.ApiMessage;
+import com.job.util.error.IdInvalidException;
 
 import jakarta.validation.Valid;
+
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -42,7 +46,7 @@ private final UserService userService;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.securityUtil = securityUtil;
     }
-    @PostMapping("/login")
+    @PostMapping("/auth/login")
     public ResponseEntity<RestLoginDTO> login(@Valid  @RequestBody LoginDTO loginDto) {
         //Nạp input gồm username/password vào Security
  UsernamePasswordAuthenticationToken authenticationToken 
@@ -51,7 +55,7 @@ private final UserService userService;
 //xác thực người dùng => cần viết hàm loadUserByUsername
 Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 //create tooken 
-String access_token = this.securityUtil.createToken(authentication);
+
 SecurityContextHolder.getContext().setAuthentication(authentication);
 
 
@@ -62,7 +66,9 @@ if(currentUser != null) {
     RestLoginDTO.UserLogin userLogin = new RestLoginDTO.UserLogin(currentUser.getId(), currentUser.getEmail(), currentUser.getName());
     res.setUser(userLogin);
 }
+String access_token = this.securityUtil.createAccessToken(authentication.getName(), res.getUser());
 res.setAccessToken(access_token);
+
 
 //create refressh token
 String refresh_token = this.securityUtil.createFreshToken(loginDto.getUsername(), res);
@@ -85,8 +91,65 @@ return ResponseEntity.ok()
 
 @GetMapping("/auth/account")
 @ApiMessage("fetch account mesage")
-public String getAccount() {
-    return "fetch account";
+public ResponseEntity<RestLoginDTO.UserLogin> getAccount() {
+    String email = SecurityUtil.getCurrentUserJWT().isPresent() 
+    ? SecurityUtil.getCurrentUserJWT().get() : "";
+User currentUser = this.userService.handleGetUserByUsername(email);
+RestLoginDTO.UserLogin userLogin = new RestLoginDTO.UserLogin();
+if(currentUser != null) {
+   userLogin.setId(currentUser.getId());
+   userLogin.setEmail(currentUser.getEmail());
+    userLogin.setName(currentUser.getName());
+    
+}
+    return ResponseEntity.ok(userLogin);
+}
+
+@GetMapping("auth/refresh")
+@ApiMessage("get User by refresh token")
+public ResponseEntity<RestLoginDTO> getRefreshToken (@CookieValue(name="refresh_token", defaultValue = "abc") String refresh_token) throws IdInvalidException{
+    if(refresh_token.equals("abc")) {
+        throw new IdInvalidException("Ban chưa có refresh token o cookie");
+    }
+    //check valid token
+      Jwt decode =   this.securityUtil.checkValidToken(refresh_token);
+      String email = decode.getSubject();
+      //check user có tồn tại và token có hợp lệ không
+      User currentUser =this.userService.findByRefreshTokenAndEmail(refresh_token, email);
+      if(currentUser == null) {
+        throw new IdInvalidException("Refresh token không hợp lệ");
+      } 
+
+    //issue new token/set refresh token as cookie
+RestLoginDTO res = new RestLoginDTO();
+User currentUserDB = this.userService.handleGetUserByUsername(email);
+
+if(currentUserDB != null) {
+    RestLoginDTO.UserLogin userLogin = new RestLoginDTO.UserLogin(currentUser.getId(), currentUser.getEmail(), currentUser.getName());
+    res.setUser(userLogin);
+}
+String access_token = this.securityUtil.createAccessToken(email, res.getUser());
+res.setAccessToken(access_token);
+
+
+//create refressh token
+String new_refresh_token = this.securityUtil.createFreshToken(email, res);
+this.userService.updateUserToken(new_refresh_token, email);
+
+ResponseCookie resCookie = ResponseCookie
+.from("refresh_token", new_refresh_token)
+.httpOnly(true)
+.path("/")
+.maxAge(accessTokenExpiration) 
+.secure(true)// Chỉ gửi cookie qua HTTPS
+
+.build();
+
+    
+return ResponseEntity.ok()
+.header(HttpHeaders.SET_COOKIE, resCookie.toString())
+.body(res);
+
 }
 
 

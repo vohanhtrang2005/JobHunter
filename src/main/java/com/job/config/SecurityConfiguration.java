@@ -55,7 +55,7 @@ public class SecurityConfiguration {
         .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(
                         authz -> authz
-                                .requestMatchers("/","/login","/api/v1/auth/refresh", "/users","api/v1/login").permitAll()
+                                .requestMatchers("/","/login","/api/v1/auth/refresh", "/users","/api/v1/auth/login","/api/v1/auth/fresh").permitAll()
                                 .anyRequest().authenticated()
                                 
                               
@@ -88,7 +88,7 @@ public JwtEncoder jwtEncoder() {
  public JwtAuthenticationConverter jwtAuthenticationConverter() {  
     JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new  JwtGrantedAuthoritiesConverter(); 
  grantedAuthoritiesConverter.setAuthorityPrefix(""); 
- grantedAuthoritiesConverter.setAuthoritiesClaimName("vohanhtrang"); 
+ grantedAuthoritiesConverter.setAuthoritiesClaimName("permission"); 
  JwtAuthenticationConverter jwtAuthenticationConverter = new  JwtAuthenticationConverter(); 
   
 jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter); 
