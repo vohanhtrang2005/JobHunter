@@ -32,7 +32,7 @@ public class Company {
         private String description;
         private String logo;
 
-        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
+        //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
        @Column(name = "create_at")
     private Instant createAt;
 

@@ -91,18 +91,20 @@ return ResponseEntity.ok()
 
 @GetMapping("/auth/account")
 @ApiMessage("fetch account mesage")
-public ResponseEntity<RestLoginDTO.UserLogin> getAccount() {
-    String email = SecurityUtil.getCurrentUserJWT().isPresent() 
-    ? SecurityUtil.getCurrentUserJWT().get() : "";
+public ResponseEntity<RestLoginDTO.UserGetAccount> getAccount() {
+    String email = SecurityUtil.getCurrentUserLogin().isPresent() 
+    ? SecurityUtil.getCurrentUserLogin().get() : "";
 User currentUser = this.userService.handleGetUserByUsername(email);
 RestLoginDTO.UserLogin userLogin = new RestLoginDTO.UserLogin();
+RestLoginDTO.UserGetAccount userGetAccount = new RestLoginDTO.UserGetAccount(); 
 if(currentUser != null) {
    userLogin.setId(currentUser.getId());
    userLogin.setEmail(currentUser.getEmail());
     userLogin.setName(currentUser.getName());
+    userGetAccount.setUser(userLogin);
     
 }
-    return ResponseEntity.ok(userLogin);
+    return ResponseEntity.ok(userGetAccount);
 }
 
 @GetMapping("auth/refresh")
