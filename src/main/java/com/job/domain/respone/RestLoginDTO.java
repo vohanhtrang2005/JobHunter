@@ -1,4 +1,4 @@
-package com.job.domain.dto;
+package com.job.domain.respone;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

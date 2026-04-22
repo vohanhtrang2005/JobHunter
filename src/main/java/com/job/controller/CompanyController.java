@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.job.domain.Company;
-import com.job.domain.dto.ResultPaginationDTO;
+import com.job.domain.respone.ResultPaginationDTO;
 import com.job.service.CompanyService;
 import com.turkraft.springfilter.boot.Filter;
 

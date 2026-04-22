@@ -9,8 +9,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.job.domain.Company;
-import com.job.domain.dto.Meta;
-import com.job.domain.dto.ResultPaginationDTO;
+import com.job.domain.respone.ResultPaginationDTO;
 import com.job.reponsitory.CompanyReponsitory;
 
 import jakarta.persistence.PreUpdate;
@@ -27,7 +26,7 @@ public class CompanyService {
     public ResultPaginationDTO handleGetCompany(Specification<Company> spec, Pageable pageable) {
         Page<Company> pageCompany = companyRepository.findAll(spec,pageable);
         ResultPaginationDTO rs = new ResultPaginationDTO();
-        Meta mt = new Meta();
+        ResultPaginationDTO.Meta mt = new ResultPaginationDTO.Meta();
         mt.setPage(pageable.getPageNumber()+1);
         mt.setPageSize(pageable.getPageSize());
         mt.setTotal(pageCompany.getTotalElements());
@@ -54,4 +53,10 @@ public class CompanyService {
     public void handleDeleteCompany(Long id) {
         this.companyRepository.deleteById(id);
     }
-}
+    public Optional<Company> handleFindCompany(Long id) {
+        return companyRepository.findById(id);
+    }
+
+    }
+
+

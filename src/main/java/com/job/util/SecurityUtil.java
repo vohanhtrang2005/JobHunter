@@ -25,7 +25,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.stereotype.Service;
 
-import com.job.domain.dto.RestLoginDTO;
+import com.job.domain.respone.RestLoginDTO;
 import com.nimbusds.jose.util.Base64;
 
 @Service

@@ -1,4 +1,4 @@
-package com.job.service;
+package com.job.config;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import com.job.domain.User;
+import com.job.service.UserService;
 @Component("userDetailService")
 public class UserDetailsCustom implements UserDetailsService {
 

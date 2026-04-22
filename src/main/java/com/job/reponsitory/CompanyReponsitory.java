@@ -8,7 +8,5 @@ import com.job.domain.Company;
 
 @Repository
 public interface CompanyReponsitory extends JpaRepository<Company, Long>, JpaSpecificationExecutor<Company> {
-    
-    
-    
+
 }

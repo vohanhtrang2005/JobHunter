@@ -10,23 +10,37 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.job.domain.Company;
 import com.job.domain.User;
-import com.job.domain.dto.Meta;
-import com.job.domain.dto.ResCreateUserDTO;
-import com.job.domain.dto.ResUpdateUserDTO;
-import com.job.domain.dto.ResUserDTO;
-import com.job.domain.dto.ResultPaginationDTO;
+import com.job.domain.respone.ResCreateUserDTO;
+import com.job.domain.respone.ResUpdateUserDTO;
+import com.job.domain.respone.ResUserDTO;
+import com.job.domain.respone.ResultPaginationDTO;
 import com.job.reponsitory.UserRepository;
 import com.job.util.constant.GenderEnum;
+import com.job.util.error.IdInvalidException;
 
 
 @Service
 public class UserService {
     private final UserRepository userReponsitory;
-    public UserService(UserRepository userReponsitory) {
+        private final CompanyService companyService;
+    public UserService(UserRepository userReponsitory, CompanyService companyService) {
+         this.companyService = companyService;
         this.userReponsitory = userReponsitory;
     }
-public User createUser(User user)  {
+public User createUser(User user) throws IdInvalidException {
+      boolean isEmailExist = this.isEmailExist(user.getEmail());
+        if (isEmailExist) {
+            throw new IdInvalidException("Email already exists");
+        }
+    
+    //check company
+  Company company = this.companyService
+            .handleFindCompany(user.getCompany().getId())
+            .orElseThrow(() -> new IdInvalidException("Company not found"));
+
+        user.setCompany(company);
    
   return userReponsitory.save(user);
 }
@@ -40,6 +54,8 @@ public ResCreateUserDTO convertToResCreateUserDTO(User user) {
     userDTO.setGender(user.getGender());
     userDTO.setName(user.getName());
     userDTO.setEmail(user.getEmail());
+   
+    
     return userDTO;
 }
 public boolean isEmailExist(String email) {
@@ -76,7 +92,7 @@ public User handleGetUserByUsername(String username) {
 public ResultPaginationDTO fetchAllUsers(Specification spec, Pageable pageable) {
   org.springframework.data.domain.Page<User> pageUser = userReponsitory.findAll(spec, pageable);
     ResultPaginationDTO rs = new ResultPaginationDTO();
- Meta mt = new Meta();
+    ResultPaginationDTO.Meta mt = new ResultPaginationDTO.Meta();
     mt.setPage(pageable.getPageNumber()+1);   
     mt.setPageSize(pageable.getPageSize());
 

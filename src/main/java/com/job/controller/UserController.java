@@ -23,10 +23,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.job.domain.User;
-import com.job.domain.dto.ResultPaginationDTO;
-import com.job.domain.dto.ResCreateUserDTO;
-import com.job.domain.dto.ResUpdateUserDTO;
-import com.job.domain.dto.ResUserDTO;
+import com.job.domain.respone.ResCreateUserDTO;
+import com.job.domain.respone.ResUpdateUserDTO;
+import com.job.domain.respone.ResUserDTO;
+import com.job.domain.respone.ResultPaginationDTO;
+import com.job.service.CompanyService;
 import com.job.service.UserService;
 import com.job.util.annotation.ApiMessage;
 import com.job.util.error.IdInvalidException;
@@ -38,18 +39,18 @@ import jakarta.validation.Valid;
 public class UserController {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder; 
+      private final CompanyService companyService; 
 
-    public UserController(UserService userService, PasswordEncoder passwordEncoder) {
+    public UserController(UserService userService, PasswordEncoder passwordEncoder, CompanyService companyService) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
+        this.companyService = companyService;
     }
       @PostMapping("/users")
     @ApiMessage("Create a new user")
     public ResponseEntity<ResCreateUserDTO> createNewUser(@Valid @RequestBody User PostManUser) throws IdInvalidException {
-        boolean isEmailExist = this.userService.isEmailExist(PostManUser.getEmail());
-        if (isEmailExist) {
-            throw new IdInvalidException("Email already exists");
-        }
+      
+        
 
         String hashPassword = this.passwordEncoder.encode(PostManUser.getPassword());
         PostManUser.setPassword(hashPassword);
