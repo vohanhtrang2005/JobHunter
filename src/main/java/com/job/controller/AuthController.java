@@ -54,7 +54,7 @@ public class AuthController {
                 loginDto.getUsername(), loginDto.getPassword());
 
         // xác thực người dùng => cần viết hàm loadUserByUsername
-        ProviderManager providerManager = new ProviderManager();
+//ProviderManager providerManager = new ProviderManager();
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         // create tooken
 

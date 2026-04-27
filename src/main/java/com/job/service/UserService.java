@@ -54,7 +54,18 @@ public ResCreateUserDTO convertToResCreateUserDTO(User user) {
     userDTO.setGender(user.getGender());
     userDTO.setName(user.getName());
     userDTO.setEmail(user.getEmail());
+
+  ResCreateUserDTO.CompanyUser companyUser = new ResCreateUserDTO.CompanyUser();
+
+companyUser.setId(user.getCompany().getId());
+companyUser.setName(user.getCompany().getName());
+
+// gán vào DTO
+userDTO.setCompany(companyUser);
    
+
+
+    
     
     return userDTO;
 }
@@ -99,6 +110,8 @@ public ResultPaginationDTO fetchAllUsers(Specification spec, Pageable pageable) 
     mt.setTotal(pageUser.getTotalElements());
     mt.setPages(pageUser.getTotalPages());
     rs.setMeta(mt);
+
+
   List<ResUserDTO> listUserDTO = pageUser.getContent().stream().map(u -> convertToResUserDTO(u)).toList();
 
 
@@ -139,6 +152,15 @@ public ResUserDTO convertToResUserDTO(User user) {
     userDTO.setName(user.getName());
     userDTO.setEmail(user.getEmail());
     userDTO.setUpdatedAt(user.getUpdatedAt());
+
+if(user.getCompany() == null) {
+ userDTO.setCompany(null);
+}
+else{
+    ResUserDTO.CompanyUser companyUser = new ResUserDTO.CompanyUser();
+companyUser.setId(user.getCompany().getId());
+companyUser.setName(user.getCompany().getName());
+    userDTO.setCompany(companyUser); }
     return userDTO;
 } 
 public void updateUserToken(String token, String email){
