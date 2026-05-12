@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import com.job.domain.Company;
 import com.job.domain.respone.ResultPaginationDTO;
 import com.job.reponsitory.CompanyReponsitory;
+import com.job.util.error.IdInvalidException;
+import com.job.util.error.ResourceNotFoundException;
 
 import jakarta.persistence.PreUpdate;
 
@@ -21,6 +23,7 @@ public class CompanyService {
         this.companyRepository = companyRepository;
     }
     public Company handleCreateService(Company reqCompany) {
+        reqCompany.setIsActive(true);
         return companyRepository.save(reqCompany);
     }
     public ResultPaginationDTO handleGetCompany(Specification<Company> spec, Pageable pageable) {
@@ -50,12 +53,25 @@ public class CompanyService {
             return null;
           }
     }
-    public void handleDeleteCompany(Long id) {
-        this.companyRepository.deleteById(id);
+    public void handleDeleteCompany(Long id) throws IdInvalidException {
+       Company company = this.handleFindCompany(id)    
+        .orElseThrow(() -> new IdInvalidException("Company not found with id = " + id));
+       
+            company.setIsActive(false);
+            this.companyRepository.save(company);
+        
     }
     public Optional<Company> handleFindCompany(Long id) {
         return companyRepository.findById(id);
     }
+public void softDeleteCompany(Long id) throws ResourceNotFoundException{
+    Company company = companyRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException(
+            "Company not found with id = " + id));
+
+    company.setIsActive(false);
+    companyRepository.save(company);
+}
 
     }
 

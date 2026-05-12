@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.job.domain.User;
+import com.job.domain.request.ReqUpdateUserDTO;
 import com.job.domain.respone.ResCreateUserDTO;
 import com.job.domain.respone.ResUpdateUserDTO;
 import com.job.domain.respone.ResUserDTO;
@@ -67,33 +68,34 @@ public class UserController {
     // }
     @DeleteMapping("/users/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) throws IdInvalidException {
-        if (id >= 1500) {
+     if (id >= 1500) {
             throw new IdInvalidException("ID is invalid, must be less than 1500");
-        }
-        User currentUser = this.userService.fetchUserById(id);
-        if(currentUser == null) {
-            throw new IdInvalidException("User with ID " + id + " does not exist");
         }
         userService.handleDeleteUser(id);
 
         return ResponseEntity.ok(null);
     }
 
-    @PutMapping("/users")
-    public ResponseEntity<ResUpdateUserDTO> putUser(@RequestBody User PostManUser) throws IdInvalidException {
-         if(PostManUser.getId() == null) {
-            throw new IdInvalidException("ID is required for update");
-        }
-         if(PostManUser.getId() >= 1500) {
-            throw new IdInvalidException("ID is invalid, must be less than 1500");
-        }
+  @PutMapping("/users")
+public ResponseEntity<ResUpdateUserDTO> putUser(
+        @RequestBody ReqUpdateUserDTO req)
+        throws IdInvalidException {
 
-        User user = this.userService.handleUpdateUser(PostManUser);
-if(user==null) {
-    throw new IdInvalidException("User with ID " + PostManUser.getId() + " does not exist");
-}
-        return ResponseEntity.ok(this.userService.resUpdateUserDTO(user));
+    if(req.getId() >= 1500) {
+        throw new IdInvalidException(
+            "ID is invalid, must be less than 1500");
     }
+
+    User user = this.userService.handleUpdateUser(req);
+
+    if(user == null) {
+        throw new IdInvalidException(
+            "User not found");
+    }
+
+    return ResponseEntity.ok(
+        this.userService.resUpdateUserDTO(user));
+}
 
     @GetMapping("/users/{id}")
     public ResponseEntity<ResUserDTO> getUserById(@PathVariable("id") Long id) throws IdInvalidException {

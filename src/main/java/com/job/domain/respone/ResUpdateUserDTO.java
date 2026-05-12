@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ResUpdateUserDTO {
-    ResUpdateUserDTO res = new ResUpdateUserDTO();
+   
     private long id;
     private String name;
     private String address;
@@ -17,10 +17,19 @@ public class ResUpdateUserDTO {
     private GenderEnum gender;
     private Instant updatedAt;
     private CompanyUser company;
+        private RoleUser role;
+    
 
 @Getter
 @Setter
 public static class CompanyUser {
+    private long id;
+    private String name;
+}
+
+@Getter
+@Setter
+public static class RoleUser {
     private long id;
     private String name;
 }

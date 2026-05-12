@@ -81,5 +81,14 @@ public ResponseEntity<RestResponse<Object>> handleInvalidEnum(InvalidFormatExcep
 
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
 }
+@ExceptionHandler(ResourceNotFoundException.class)
+public ResponseEntity<RestResponse<Object>> handleNotFound(ResourceNotFoundException ex) {
+    RestResponse<Object> res = new RestResponse<>();
+    res.setError(ex.getMessage());
+    res.setStatusCode(HttpStatus.NOT_FOUND.value());
+    res.setMessage("Resource not found");
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+}
+
 
 }

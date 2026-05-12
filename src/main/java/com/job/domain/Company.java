@@ -34,6 +34,8 @@ public class Company {
         @Column(columnDefinition = "MEDIUMTEXT")
         private String description;
         private String logo;
+        @Column(name = "is_active")
+        private Boolean isActive;
 
         //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
        @Column(name = "create_at")

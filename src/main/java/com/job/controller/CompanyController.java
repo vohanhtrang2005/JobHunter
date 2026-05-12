@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.job.domain.Company;
 import com.job.domain.respone.ResultPaginationDTO;
 import com.job.service.CompanyService;
+import com.job.util.error.IdInvalidException;
+import com.job.util.error.ResourceNotFoundException;
 import com.turkraft.springfilter.boot.Filter;
 
 import org.springframework.web.bind.annotation.RequestBody;
@@ -50,8 +52,11 @@ public class CompanyController {
           return ResponseEntity.ok(updatedCompany);
      }
      @DeleteMapping("/companies/{id}")
-     public ResponseEntity<Void> deleteCompany(@PathVariable("id") Long id) {
-          this.companyService.handleDeleteCompany(id);
-          return ResponseEntity.ok(null);
-     }
+     public ResponseEntity<Void> deleteCompany(@PathVariable("id") Long id) throws IdInvalidException{
+           if (id >= 1500) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+           }
+            this.companyService.handleDeleteCompany(id);
+               return ResponseEntity.noContent().build();
+}
 }

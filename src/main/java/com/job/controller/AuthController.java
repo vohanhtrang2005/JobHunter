@@ -64,11 +64,14 @@ public class AuthController {
         User currentUser = this.userService.handleGetUserByUsername(loginDto.getUsername());
 
         if (currentUser != null) {
-            RestLoginDTO.UserLogin userLogin = new RestLoginDTO.UserLogin(currentUser.getId(), currentUser.getEmail(),
-                    currentUser.getName());
+            RestLoginDTO.UserLogin userLogin = new RestLoginDTO.UserLogin(
+                currentUser.getId()
+                , currentUser.getEmail(),
+                    currentUser.getName(),
+                    currentUser.getRole()               );
             res.setUser(userLogin);
         }
-        String access_token = this.securityUtil.createAccessToken(authentication.getName(), res.getUser());
+        String access_token = this.securityUtil.createAccessToken(authentication.getName(), res);
         res.setAccessToken(access_token);
 
         // create refressh token
@@ -102,6 +105,7 @@ public class AuthController {
             userLogin.setId(currentUser.getId());
             userLogin.setEmail(currentUser.getEmail());
             userLogin.setName(currentUser.getName());
+            userLogin.setRole(currentUser.getRole());
             userGetAccount.setUser(userLogin);
 
         }
@@ -129,11 +133,14 @@ public class AuthController {
         User currentUserDB = this.userService.handleGetUserByUsername(email);
 
         if (currentUserDB != null) {
-            RestLoginDTO.UserLogin userLogin = new RestLoginDTO.UserLogin(currentUser.getId(), currentUser.getEmail(),
-                    currentUser.getName());
+            RestLoginDTO.UserLogin userLogin = new RestLoginDTO.UserLogin(
+                currentUser.getId()
+                , currentUser.getEmail(),
+                    currentUser.getName(),
+                    currentUser.getRole());
             res.setUser(userLogin);
         }
-        String access_token = this.securityUtil.createAccessToken(email, res.getUser());
+        String access_token = this.securityUtil.createAccessToken(email, res);
         res.setAccessToken(access_token);
 
         // create refressh token
