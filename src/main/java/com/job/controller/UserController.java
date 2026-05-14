@@ -47,7 +47,9 @@ public class UserController {
         this.passwordEncoder = passwordEncoder;
         this.companyService = companyService;
     }
+
       @PostMapping("/users")
+       @PreAuthorize("hasAuthority('USER_CREATE')") 
     @ApiMessage("Create a new user")
     public ResponseEntity<ResCreateUserDTO> createNewUser(@Valid @RequestBody User PostManUser) throws IdInvalidException {
       

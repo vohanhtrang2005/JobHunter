@@ -12,8 +12,9 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
 
-  
+   @EntityGraph(attributePaths = {"role", "role.permissions"}) 
     User findByEmail(String email);
+    
     Optional<User>  findById(Long id);
     
     boolean existsByEmail(String email);
