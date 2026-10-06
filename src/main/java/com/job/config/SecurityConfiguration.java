@@ -49,7 +49,8 @@ public class SecurityConfiguration {
 
      @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
-    CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
+    CustomAuthenticationEntryPoint customAuthenticationEntryPoint,
+    CustomAccessDeniedHandler customAccessDeniedHandler) throws Exception {
         http
         .csrf(c -> c.disable())
         .cors(Customizer.withDefaults())
@@ -61,7 +62,8 @@ public class SecurityConfiguration {
                               
                 )
                   .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults())
-                  .authenticationEntryPoint(customAuthenticationEntryPoint)     
+                  .authenticationEntryPoint(customAuthenticationEntryPoint)
+                  .accessDeniedHandler(customAccessDeniedHandler)
                   )
                           
                 //   .exceptionHandling(

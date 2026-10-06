@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
@@ -55,7 +56,7 @@ public ResponseEntity<RestResponse<Object>> handleIdException(Exception ex) {
         res.setError(ex.getMessage());
         res.setStatusCode(HttpStatus.NOT_FOUND.value());
         res.setMessage("404 not found. URL is invalid or resource does not exist");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
     }
    
     
@@ -90,5 +91,13 @@ public ResponseEntity<RestResponse<Object>> handleNotFound(ResourceNotFoundExcep
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
 }
 
+@ExceptionHandler(AccessDeniedException.class)
+public ResponseEntity<RestResponse<Object>> handleAccessDeniedException(AccessDeniedException ex) {
+    RestResponse<Object> res = new RestResponse<>();
+    res.setStatusCode(HttpStatus.FORBIDDEN.value());
+    res.setError(ex.getMessage());
+    res.setMessage("Bạn không có quyền truy cập tài nguyên này (Forbidden)!");
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
+}
 
 }
